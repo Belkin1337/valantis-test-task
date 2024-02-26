@@ -18,7 +18,6 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",
-    "crypto-js": "^4.2.0",
     "lucide-react": "^0.338.0",
     "md5": "^2.3.0",
     "react": "^18.2.0",

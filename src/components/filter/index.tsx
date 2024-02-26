@@ -6,34 +6,16 @@ import { useSearchParams } from "react-router-dom"
 import { Input } from "@/components/ui/input"
 import { ChevronsUpDown } from "lucide-react"
 import { useFilterValue } from "@/lib/hooks/use-filter-value";
-
-const params = [
-  { label: "Бренд", value: "brand", },
-  { label: "Цена", value: "price", },
-  { label: "Название", value: "product", },
-]
+import { params } from "@/lib/constants";
 
 export const FilterItem = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [searchVisible, setSearchVisible] = useState<boolean>(false)
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchType, setSearchType] = useState<string>("brand");
-  const [inputValue, setInputValue] = useState('');
-  
-  const searchRef = useRef<HTMLDivElement>(null);
-  const { setFilterValue } = useFilterValue()
 
-  const handleChange = useCallback((param: string, value: string | number) => {
-    const searchParamsObj = new URLSearchParams(searchParams);
-  
-    if (!value && value !== 0) { 
-      searchParamsObj.delete(param);
-    } else {
-      searchParamsObj.set(param, String(value));
-    }
-  
-    setSearchParams(searchParamsObj);
-  }, [searchParams, setSearchParams]);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { filterValue, setFilterValue } = useFilterValue()
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -48,6 +30,20 @@ export const FilterItem = () => {
     }
   };
 
+  const handleChange = useCallback((param: string, value: string | number) => {
+    const searchParamsObj = new URLSearchParams(searchParams);
+  
+    if (!value && value !== 0) {
+      searchParamsObj.delete(param);
+      setFilterValue({ field: searchType, value: '' });
+    } else {
+      searchParamsObj.set(param, String(value));
+      setFilterValue({ field: searchType, value: value }); 
+    }
+  
+    setSearchParams(searchParamsObj);
+  }, [searchParams, setSearchParams, searchType, setFilterValue]);
+
   useEffect(() => {
     const param = searchParams.get(searchType);
 
@@ -58,30 +54,29 @@ export const FilterItem = () => {
       });
     }
   }, [searchParams, searchType, setFilterValue]);
-  
+
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    setInputValue(value); 
     handleChange(searchType, value);
   }, [searchType, handleChange]);
 
   return (
     <div ref={searchRef} className="flex items-center gap-x-4">
-      {searchVisible ? (
-        <div className="flex items-center gap-x-2 bg-neutral-100/60 pl-2 rounded-xl">
+      {searchVisible || filterValue.value ? (
+        <div className="flex items-center gap-x-2 bg-neutral-100 pl-2 rounded-xl">
           <Search size={20} className="text-neutral-600" />
           <Input
             placeholder={`Найти по ${searchType}`}
+            value={filterValue.value}
             className="bg-transparent border-none outline-none ring-0 ring-transparent"
-            value={inputValue}
             type={searchType === 'price' ? 'number' : 'text'}
             onChange={handleInputChange}
           />
         </div>
       ) : (
         <div onClick={() => setSearchVisible(!searchVisible)}
-          className="bg-transparent hover:bg-neutral-100/60 rounded-full p-2 cursor-pointer">
+          className="bg-transparent hover:bg-neutral-100 rounded-full p-2 cursor-pointer">
           <Search
             size={20}
             className="text-neutral-600"
@@ -99,9 +94,14 @@ export const FilterItem = () => {
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0 flex flex-col">
           {params.map((param) => (
-            <div key={param.value} className="p-2 hover:bg-neutral-100" onClick={() => setSearchType(param.value)}>
+            <Button
+              variant="link"
+              key={param.value}
+              className="p-2 hover:bg-neutral-100 cursor-pointer"
+              onClick={() => setSearchType(param.value)}
+            >
               {param.label}
-            </div>
+            </Button>
           ))}
         </PopoverContent>
       </Popover>

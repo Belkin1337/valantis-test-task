@@ -1,7 +1,8 @@
-const api_point = "http://api.valantis.store:40000/"
-const api_pass = "Valantis"
+export const api_point = "https://api.valantis.store:41000/"
+export const api_pass = "Valantis"
 
-export {
-  api_point,
-  api_pass
-}
+export const params = [
+  { label: "Бренд", value: "brand", },
+  { label: "Цена", value: "price", },
+  { label: "Название", value: "product", },
+]

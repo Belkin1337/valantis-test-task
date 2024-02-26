@@ -1,5 +1,5 @@
 import { FilterValueGeneric } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchAPI } from "../api/get-ids";
 
 export const useFilter = ({ 
@@ -14,6 +14,7 @@ export const useFilter = ({
       [field]: filteredValue
     }),
     enabled: !!field && value !== null,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
